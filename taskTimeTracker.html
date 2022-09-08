@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Document</title>
+        <style>
+            #task-detail{
+                background-color: rgb(177, 199, 52);
+                width: 800px;
+                height: auto;
+                padding: 20px;
+                margin: auto;
+                text-align: center;
+            }
+            #task-detail input{
+                width: 450px;
+                height: 40px;
+                padding: 0px;
+                font-size: 20px;
+                margin: 15px 0px;
+            }
+            #task-detail button{
+                width: 100px;
+                height: 40px;
+                font-size: 20px;
+            }
+            #tsks div{
+                display: flex;
+                align-items: center;
+                justify-content:space-between ;
+                height: 60px;
+                border: solid 1px black;
+                margin: 10px 0px;
+                padding: 10px;
+                box-sizing: border-box;
+            }
+            #tsks div h2{
+                width: 300px;
+            }
+            #tsks div input{
+                width: 200px;
+            }
+            #tsks div button{
+                width: auto;
+            }
+            #header{
+                display: flex;
+                justify-content: center;
+            }
+            
+        </style>
+    </head>
+    <body>
+        <h1 align="center"> task time trackers </h1>
+        
+        <div id="task-detail">
+            <h2>Task</h2>
+            <hr>
+            <div id="tsks">
+                <div id="header"> 
+                    <h2>Task Name</h2>
+                    <h2>Start Date </h2>
+                    <h2>End Date</h2>
+                    <h2>Action</h2>
+                </div>
+                
+            </div>
+            
+            <input type="text" placeholder="task name" id="task_val"> 
+            <button onclick="add()">add</button> 
+        </div>
+        
+        <script>
+            
+            var tasks = [];
+            
+            function complete(e)
+            {
+                var id = (window.event.target.id);
+                console.log(id);
+                let parentId = Number(document.getElementById(id).parentNode.id);
+                let endDate = document.getElementById(id).previousElementSibling;
+                let startDate = document.getElementById(id).previousElementSibling.previousElementSibling.value;
+                startDate = new Date(startDate);
+                
+                let currentTime = new Date();
+                let totalMin =parseInt((currentTime- startDate)/60000);
+                let totalSec = parseInt((currentTime - startDate) % 60);
+                
+                console.log(totalMin+"min");
+                console.log(totalSec+"sec");
+                endDate.value = `${totalMin} min , ${totalSec} sec`;
+                
+                
+                tasks = localStorage.getItem("tasks");
+                tasks = JSON.parse(tasks);
+                tasks[parentId].endDate = `${totalMin} min , ${totalSec} sec`;
+                
+                tasks = JSON.stringify(tasks);
+
+                localStorage.setItem("tasks", tasks);
+            }
+            
+            
+            function display() {
+                    tasks = localStorage.getItem("tasks");
+                    tasks = JSON.parse(tasks);
+                    console.log(tasks);
+
+                    for (let i = 0; i < tasks.length; i++) {
+                        var h2 = document.createElement("h2");
+                        h2.textContent = tasks[i].taskName;
+
+                        var inp1 = document.createElement("input");
+                        inp1.value = tasks[i].startDate;
+                        
+                        var inp2 = document.createElement("input");
+                        inp2.value = tasks[i].endDate;
+                        
+
+                        var btn = document.createElement("button");
+                        btn.textContent = "completed";
+                        btn.id = `${tasks[i].taskName}${i}`;
+                        btn.setAttribute("onclick" , "complete()")
+
+                        var div = document.createElement("div");
+                        div.id = `${i}`
+                        div.append(h2, inp1,inp2 , btn);
+
+                        document.getElementById("tsks").append(div);
+                    }
+                }
+            
+            (()=>{
+                if(localStorage.getItem("tasks")==null)
+                {
+                    
+                    localStorage.setItem("tasks" , "[]" )
+                }
+                else
+                {
+                    display();
+                }
+            })  ()
+            
+            
+            function add()
+            {
+                let taskName = document.getElementById("task_val").value;
+                let date = new Date();
+                date = date.toLocaleString();
+                
+                let task = {taskName:taskName , startDate : date , endDate : "On Going"};
+                
+                tasks = localStorage.getItem("tasks");
+                tasks = JSON.parse(tasks);
+                tasks.push(task);
+                
+                tasks = JSON.stringify(tasks);
+                
+                localStorage.setItem("tasks" , tasks);
+                
+                console.log(tasks , typeof tasks);
+                
+                location.reload();
+            }        
+        </script>
+        
+    </body>
+</html>
